@@ -1,0 +1,40 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'auth-service'
+    static_configs:
+      - targets: ['auth-service:8001']
+
+  - job_name: 'material-service'
+    static_configs:
+      - targets: ['material-service:8002']
+
+  - job_name: 'ai-service'
+    static_configs:
+      - targets: ['ai-service:8003']
+
+  - job_name: 'memory-service'
+    static_configs:
+      - targets: ['memory-service:8004']
+
+  - job_name: 'planner-agent'
+    static_configs:
+      - targets: ['planner-agent:8011']
+
+  - job_name: 'retrieval-agent'
+    static_configs:
+      - targets: ['retrieval-agent:8012']
+
+  - job_name: 'tutor-agent'
+    static_configs:
+      - targets: ['tutor-agent:8013']
+
+  - job_name: 'critic-agent'
+    static_configs:
+      - targets: ['critic-agent:8014']
