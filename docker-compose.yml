@@ -15,7 +15,7 @@ services:
       JWT_EXPIRE_MINUTES: 60
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     ports:
-      - "8101:8101"
+      - "8101:8001"
     networks:
       - studymate-network
 
@@ -31,7 +31,7 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       AUTH_SERVICE_URL: http://auth-service:8001
     ports:
-      - "8102:8102"
+      - "8102:8002"
     networks:
       - studymate-network
     depends_on:
@@ -45,7 +45,7 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       AUTH_SERVICE_URL: http://auth-service:8001
     ports:
-      - "8104:8104"
+      - "8104:8004"
     networks:
       - studymate-network
     depends_on:
@@ -64,7 +64,7 @@ services:
       LANGFUSE_SECRET_KEY: sk-lf-placeholder
       LANGFUSE_HOST: http://langfuse:3000
     ports:
-      - "8103:8103"
+      - "8103:8003"
     networks:
       - studymate-network
     depends_on:
@@ -87,7 +87,7 @@ services:
       LANGFUSE_HOST: http://langfuse:3000
       COLLECTION_NAME: study_materials
     ports:
-      - "8110:8110"
+      - "8110:8010"
     networks:
       - studymate-network
     depends_on:
