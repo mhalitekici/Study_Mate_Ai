@@ -1,7 +1,8 @@
 from fastapi import APIRouter, HTTPException, Header
 from app.core.config import settings
-from app.core.rag_pipeline import retrieve_context, generate_answer, get_embeddings
+from app.core.rag_pipeline import retrieve_context, generate_answer
 from app.core.qdrant_client import qdrant, ensure_collection
+from app.core.cache import get_cached_answer, set_cached_answer
 from app.schemas.ai import QuestionRequest, AnswerResponse, IndexRequest
 from qdrant_client.models import PointStruct
 import httpx
@@ -49,6 +50,11 @@ async def save_to_memory(user_id: int, question: str, answer: str):
 
 @router.post("/generate", response_model=AnswerResponse)
 async def generate(request: QuestionRequest):
+    # Redis cache kontrolü
+    cached = get_cached_answer(request.question, request.user_id)
+    if cached:
+        return AnswerResponse(**cached)
+
     try:
         from app.core.langfuse_client import langfuse
         trace = langfuse.trace(
@@ -63,26 +69,24 @@ async def generate(request: QuestionRequest):
     context = await retrieve_context(request.question, request.user_id)
     context_used = context != "No relevant context found in uploaded materials."
 
-    if trace:
-        trace.span(
-            name="retrieval",
-            input=request.question,
-            output=context
-        )
-
     answer = await generate_answer(request.question, context, history, trace)
 
     await save_to_memory(request.user_id, request.question, answer)
 
+    result = {
+        "question": request.question,
+        "answer": answer,
+        "context_used": context_used,
+        "user_id": request.user_id
+    }
+
+    # Redis'e cache'le
+    set_cached_answer(request.question, request.user_id, result)
+
     if trace:
         trace.update(output=answer)
 
-    return AnswerResponse(
-        question=request.question,
-        answer=answer,
-        context_used=context_used,
-        user_id=request.user_id
-    )
+    return AnswerResponse(**result)
 
 @router.post("/index", status_code=201)
 async def index_material(request: IndexRequest):

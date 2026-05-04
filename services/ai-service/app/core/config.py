@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     LANGFUSE_SECRET_KEY: str = "sk-lf-placeholder"
     LANGFUSE_HOST: str = "http://localhost:3001"
     COLLECTION_NAME: str = "study_materials"
+    REDIS_URL: str = "redis://localhost:6379"
+    KAFKA_BOOTSTRAP_SERVERS: str = "localhost:29092"
 
     class Config:
         env_file = os.path.join(os.path.dirname(__file__), "../../../../.env")

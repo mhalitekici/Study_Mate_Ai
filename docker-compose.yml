@@ -18,6 +18,19 @@ services:
       - "8101:8001"
     networks:
       - studymate-network
+  api-gateway:
+    build: ./gateway
+    container_name: api-gateway
+    ports:
+      - "8000:80"
+    networks:
+      - studymate-network
+    depends_on:
+      - auth-service
+      - material-service
+      - memory-service
+      - ai-service
+      - multi-agent
 
   material-service:
     build: ./services/material-service
@@ -60,6 +73,8 @@ services:
       OLLAMA_MODEL: qwen2.5
       MEMORY_SERVICE_URL: http://memory-service:8004
       AUTH_SERVICE_URL: http://auth-service:8001
+      REDIS_URL: redis://redis:6379
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       LANGFUSE_PUBLIC_KEY: pk-lf-placeholder
       LANGFUSE_SECRET_KEY: sk-lf-placeholder
       LANGFUSE_HOST: http://langfuse:3000
