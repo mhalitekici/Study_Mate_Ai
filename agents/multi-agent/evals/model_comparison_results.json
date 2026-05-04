@@ -1,0 +1,64 @@
+{
+  "date": "2026-05-04T14:02:35.496812",
+  "models_tested": [
+    "qwen2.5:latest",
+    "qwen3:8b",
+    "deepseek-coder:6.7b"
+  ],
+  "results": [
+    {
+      "model": "qwen2.5:latest",
+      "question": "Explain the concept of recursion in programming with an example.",
+      "status": "error",
+      "error": "Empty response"
+    },
+    {
+      "model": "qwen3:8b",
+      "question": "Explain the concept of recursion in programming with an example.",
+      "status": "error",
+      "error": "Empty response"
+    },
+    {
+      "model": "deepseek-coder:6.7b",
+      "question": "Explain the concept of recursion in programming with an example.",
+      "status": "error",
+      "error": "Empty response"
+    },
+    {
+      "model": "qwen2.5:latest",
+      "question": "What is the difference between microservices and monolithic architecture?",
+      "status": "error",
+      "error": "Empty response"
+    },
+    {
+      "model": "qwen3:8b",
+      "question": "What is the difference between microservices and monolithic architecture?",
+      "status": "error",
+      "error": "Empty response"
+    },
+    {
+      "model": "deepseek-coder:6.7b",
+      "question": "What is the difference between microservices and monolithic architecture?",
+      "status": "error",
+      "error": "Empty response"
+    },
+    {
+      "model": "qwen2.5:latest",
+      "question": "How does RAG (Retrieval-Augmented Generation) work?",
+      "status": "error",
+      "error": "Empty response"
+    },
+    {
+      "model": "qwen3:8b",
+      "question": "How does RAG (Retrieval-Augmented Generation) work?",
+      "status": "error",
+      "error": "Empty response"
+    },
+    {
+      "model": "deepseek-coder:6.7b",
+      "question": "How does RAG (Retrieval-Augmented Generation) work?",
+      "status": "error",
+      "error": "Empty response"
+    }
+  ]
+}

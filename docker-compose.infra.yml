@@ -202,13 +202,16 @@ services:
       - studymate-network
 
   langfuse:
-    image: langfuse/langfuse:latest
+    image: langfuse/langfuse:2
     container_name: langfuse
     environment:
       DATABASE_URL: postgresql://auth_user:auth_pass@postgres-auth:5432/langfuse_db
-      NEXTAUTH_SECRET: secret123
+      NEXTAUTH_SECRET: supersecret123
       NEXTAUTH_URL: http://localhost:3001
-      SALT: salt123
+      SALT: saltsaltsalt123
+      TELEMETRY_ENABLED: "false"
+      NEXT_PUBLIC_SIGN_UP_DISABLED: "false"
+      LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES: "false"
     ports:
       - "3001:3000"
     networks:
