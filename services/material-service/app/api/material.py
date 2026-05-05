@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Header
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.config import settings
-from app.core.minio_client import minio_client, ensure_bucket
+from app.core.minio_client import minio_client, ensure_buckets, HOT_BUCKET, COLD_BUCKET, move_to_cold_storage
 from app.core.kafka_producer import publish_event
 from app.models.material import Material
 from app.schemas.material import MaterialResponse, MaterialListResponse
@@ -34,7 +34,7 @@ async def upload_material(
     if file.content_type not in allowed_types:
         raise HTTPException(status_code=400, detail="File type not allowed. Use PDF, TXT or DOCX.")
 
-    ensure_bucket()
+    ensure_buckets()
     file_content = await file.read()
     file_size = len(file_content) / (1024 * 1024)
 
@@ -45,7 +45,7 @@ async def upload_material(
     minio_path = f"user_{current_user['user_id']}/{unique_filename}"
 
     minio_client.put_object(
-        settings.MINIO_BUCKET,
+        HOT_BUCKET,
         minio_path,
         io.BytesIO(file_content),
         length=len(file_content),
@@ -59,7 +59,8 @@ async def upload_material(
         file_type=file.content_type,
         file_size=file_size,
         minio_path=minio_path,
-        status="uploaded"
+        status="uploaded",
+        storage_tier="hot"
     )
     db.add(material)
     db.commit()
@@ -97,9 +98,62 @@ async def delete_material(
     if not material:
         raise HTTPException(status_code=404, detail="Material not found")
 
-    minio_client.remove_object(settings.MINIO_BUCKET, material.minio_path)
+    bucket = COLD_BUCKET if material.storage_tier == "cold" else HOT_BUCKET
+    minio_client.remove_object(bucket, material.minio_path)
     db.delete(material)
     db.commit()
+
+@router.post("/archive/{material_id}")
+async def archive_material(
+    material_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    """Move old material to cold storage"""
+    material = db.query(Material).filter(
+        Material.id == material_id,
+        Material.user_id == current_user["user_id"]
+    ).first()
+
+    if not material:
+        raise HTTPException(status_code=404, detail="Material not found")
+
+    if material.storage_tier == "cold":
+        raise HTTPException(status_code=400, detail="Material already in cold storage")
+
+    move_to_cold_storage(material.minio_path)
+
+    material.status = "archived"
+    material.storage_tier = "cold"
+    db.commit()
+
+    return {
+        "message": "Material moved to cold storage",
+        "material_id": material_id,
+        "storage_tier": "cold"
+    }
+
+@router.get("/storage/stats")
+async def get_storage_stats():
+    """Get hot vs cold storage statistics"""
+    try:
+        hot_objects = list(minio_client.list_objects(HOT_BUCKET))
+        cold_objects = list(minio_client.list_objects(COLD_BUCKET))
+
+        return {
+            "hot_storage": {
+                "bucket": HOT_BUCKET,
+                "count": len(hot_objects),
+                "description": "Active materials uploaded within last 30 days"
+            },
+            "cold_storage": {
+                "bucket": COLD_BUCKET,
+                "count": len(cold_objects),
+                "description": "Archived materials older than 30 days"
+            }
+        }
+    except Exception as e:
+        return {"error": str(e)}
 
 @router.get("/health")
 def health():

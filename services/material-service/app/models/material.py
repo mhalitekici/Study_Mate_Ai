@@ -13,5 +13,6 @@ class Material(Base):
     file_size = Column(Float, nullable=False)
     minio_path = Column(String, nullable=False)
     status = Column(String, default="uploaded")
+    storage_tier = Column(String, default="hot")
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
