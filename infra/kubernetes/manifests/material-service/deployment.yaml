@@ -18,6 +18,7 @@ spec:
       containers:
         - name: material-service
           image: studymate/material-service:latest
+          imagePullPolicy: Never
           ports:
             - containerPort: 8002
           env:

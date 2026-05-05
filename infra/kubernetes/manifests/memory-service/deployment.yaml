@@ -18,6 +18,7 @@ spec:
       containers:
         - name: memory-service
           image: studymate/memory-service:latest
+          imagePullPolicy: Never
           ports:
             - containerPort: 8004
           env:

@@ -18,6 +18,7 @@ spec:
       containers:
         - name: ai-service
           image: studymate/ai-service:latest
+          imagePullPolicy: Never
           ports:
             - containerPort: 8003
           env:
