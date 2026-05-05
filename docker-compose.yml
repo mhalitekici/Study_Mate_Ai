@@ -111,3 +111,20 @@ services:
       - auth-service
     extra_hosts:
       - "host.docker.internal:host-gateway"
+
+  recsys-service:
+    build: ./services/recsys-service
+    container_name: recsys-service
+    environment:
+      MONGODB_URL: mongodb://mongo_user:mongo_pass@mongodb:27017/recsys_db?authSource=admin
+      QDRANT_URL: http://qdrant:6333
+      AUTH_SERVICE_URL: http://auth-service:8001
+      COLLECTION_NAME: study_materials
+    ports:
+      - "8105:8005"
+    networks:
+      - studymate-network
+    depends_on:
+      - auth-service
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
