@@ -1,0 +1,27 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: material-uploaded
+  namespace: kafka
+  labels:
+    strimzi.io/cluster: studymate-kafka
+spec:
+  partitions: {{ topic_partitions }}
+  replicas: {{ kafka_replicas }}
+  config:
+    retention.ms: 604800000
+    segment.bytes: 1073741824
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: answer-generated
+  namespace: kafka
+  labels:
+    strimzi.io/cluster: studymate-kafka
+spec:
+  partitions: {{ topic_partitions }}
+  replicas: {{ kafka_replicas }}
+  config:
+    retention.ms: 604800000
+    segment.bytes: 1073741824

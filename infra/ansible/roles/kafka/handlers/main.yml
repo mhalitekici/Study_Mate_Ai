@@ -1,0 +1,6 @@
+---
+- name: restart kafka
+  command: >
+    kubectl rollout restart statefulset
+    -l strimzi.io/cluster=studymate-kafka
+    -n kafka

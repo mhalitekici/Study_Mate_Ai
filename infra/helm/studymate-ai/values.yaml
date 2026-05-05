@@ -1,0 +1,113 @@
+global:
+  namespace: studymate
+  imageRegistry: studymate
+  imageTag: latest
+
+authService:
+  enabled: true
+  replicas: 2
+  image: auth-service
+  port: 8001
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+  env:
+    jwtSecret: "supersecretjwtkey123"
+    kafkaBootstrapServers: "kafka:9092"
+
+materialService:
+  enabled: true
+  replicas: 2
+  image: material-service
+  port: 8002
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+  env:
+    minioUrl: "minio:9000"
+    minioAccessKey: "minio_user"
+    minioSecretKey: "minio_pass"
+
+aiService:
+  enabled: true
+  replicas: 2
+  image: ai-service
+  port: 8003
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "200m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  env:
+    ollamaModel: "qwen3.5:4b"
+    qdrantUrl: "http://qdrant:6333"
+    redisUrl: "redis://redis:6379"
+
+memoryService:
+  enabled: true
+  replicas: 2
+  image: memory-service
+  port: 8004
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+
+multiAgent:
+  enabled: true
+  replicas: 1
+  image: multi-agent
+  port: 8010
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "200m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+  env:
+    ollamaModel: "qwen3.5:4b"
+
+recsysService:
+  enabled: true
+  replicas: 2
+  image: recsys-service
+  port: 8005
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+
+ingress:
+  enabled: true
+  className: nginx
+  host: studymate.local
+  rateLimit: 10
+
+kafka:
+  bootstrapServers: "kafka:9092"
+
+redis:
+  url: "redis://redis:6379"
+
+qdrant:
+  url: "http://qdrant:6333"
+
+mongodb:
+  url: "mongodb://mongo_user:mongo_pass@mongodb:27017"

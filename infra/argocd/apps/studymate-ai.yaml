@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: studymate-ai
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/mhalitekici/Study_Mate_Ai
+    targetRevision: main
+    path: infra/helm/studymate-ai
+    helm:
+      valueFiles:
+        - values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: studymate
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

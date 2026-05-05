@@ -1,0 +1,53 @@
+{{- if .Values.multiAgent.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: multi-agent
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: multi-agent
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+spec:
+  replicas: {{ .Values.multiAgent.replicas }}
+  selector:
+    matchLabels:
+      app: multi-agent
+  template:
+    metadata:
+      labels:
+        app: multi-agent
+    spec:
+      containers:
+        - name: multi-agent
+          image: {{ .Values.global.imageRegistry }}/{{ .Values.multiAgent.image }}:{{ .Values.global.imageTag }}
+          ports:
+            - containerPort: {{ .Values.multiAgent.port }}
+          env:
+            - name: OLLAMA_MODEL
+              value: {{ .Values.multiAgent.env.ollamaModel }}
+            - name: QDRANT_URL
+              value: {{ .Values.qdrant.url }}
+            - name: REDIS_URL
+              value: {{ .Values.redis.url }}
+          resources:
+            {{- toYaml .Values.multiAgent.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /agent/health
+              port: {{ .Values.multiAgent.port }}
+            initialDelaySeconds: 60
+            periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: multi-agent
+  namespace: {{ .Values.global.namespace }}
+spec:
+  selector:
+    app: multi-agent
+  ports:
+    - port: {{ .Values.multiAgent.port }}
+      targetPort: {{ .Values.multiAgent.port }}
+  type: ClusterIP
+{{- end }}

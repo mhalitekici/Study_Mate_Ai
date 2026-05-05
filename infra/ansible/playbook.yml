@@ -1,0 +1,33 @@
+---
+- name: Deploy StudyMate AI Infrastructure
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    kubeconfig: "~/.kube/config"
+    namespace: studymate
+
+  pre_tasks:
+    - name: Check kubectl is available
+      command: kubectl version --client
+      register: kubectl_version
+      changed_when: false
+
+    - name: Print kubectl version
+      debug:
+        msg: "{{ kubectl_version.stdout }}"
+
+  roles:
+    - role: kafka
+      tags: kafka
+
+  post_tasks:
+    - name: Verify all pods are running
+      command: kubectl get pods -n {{ namespace }}
+      register: pods_status
+      changed_when: false
+
+    - name: Print pods status
+      debug:
+        msg: "{{ pods_status.stdout }}"

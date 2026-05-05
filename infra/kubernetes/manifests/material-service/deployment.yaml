@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: material-service
+  namespace: studymate
+  labels:
+    app: material-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: material-service
+  template:
+    metadata:
+      labels:
+        app: material-service
+    spec:
+      containers:
+        - name: material-service
+          image: studymate/material-service:latest
+          ports:
+            - containerPort: 8002
+          env:
+            - name: MATERIAL_DB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: material-secrets
+                  key: db-url
+            - name: MINIO_URL
+              value: "minio:9000"
+            - name: MINIO_ACCESS_KEY
+              value: "minio_user"
+            - name: MINIO_SECRET_KEY
+              value: "minio_pass"
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "kafka:9092"
+            - name: AUTH_SERVICE_URL
+              value: "http://auth-service:8001"
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+          livenessProbe:
+            httpGet:
+              path: /materials/health
+              port: 8002
+            initialDelaySeconds: 30
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: material-service
+  namespace: studymate
+spec:
+  selector:
+    app: material-service
+  ports:
+    - protocol: TCP
+      port: 8002
+      targetPort: 8002
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: material-secrets
+  namespace: studymate
+type: Opaque
+stringData:
+  db-url: "postgresql://material_user:material_pass@postgres-material:5432/material_db"

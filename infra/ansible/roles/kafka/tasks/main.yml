@@ -1,0 +1,62 @@
+---
+- name: Create Kafka namespace
+  kubernetes.core.k8s:
+    name: kafka
+    api_version: v1
+    kind: Namespace
+    state: present
+
+- name: Install Strimzi Operator
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: kafka
+  
+- name: Deploy Strimzi Operator via kubectl
+  command: >
+    kubectl apply -f 
+    https://strimzi.io/install/latest?namespace=kafka
+    -n kafka
+  register: strimzi_result
+  changed_when: strimzi_result.rc == 0
+
+- name: Wait for Strimzi Operator to be ready
+  command: >
+    kubectl wait deployment/strimzi-cluster-operator
+    --for=condition=available
+    --timeout=300s
+    -n kafka
+  register: wait_result
+  changed_when: false
+
+- name: Deploy Kafka Cluster
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'kafka-cluster.yaml.j2') }}"
+
+- name: Wait for Kafka to be ready
+  command: >
+    kubectl wait kafka/studymate-kafka
+    --for=condition=Ready
+    --timeout=300s
+    -n kafka
+  register: kafka_ready
+  changed_when: false
+
+- name: Create Kafka Topics
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'kafka-topics.yaml.j2') }}"
+
+- name: Verify Kafka topics created
+  command: >
+    kubectl get kafkatopics -n kafka
+  register: topics_result
+  changed_when: false
+
+- name: Print Kafka topics
+  debug:
+    msg: "{{ topics_result.stdout }}"

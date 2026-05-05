@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recsys-service
+  namespace: studymate
+  labels:
+    app: recsys-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: recsys-service
+  template:
+    metadata:
+      labels:
+        app: recsys-service
+    spec:
+      containers:
+        - name: recsys-service
+          image: studymate/recsys-service:latest
+          ports:
+            - containerPort: 8005
+          env:
+            - name: MONGODB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: memory-secrets
+                  key: mongodb-url
+            - name: QDRANT_URL
+              value: "http://qdrant:6333"
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+          livenessProbe:
+            httpGet:
+              path: /recsys/health
+              port: 8005
+            initialDelaySeconds: 30
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: recsys-service
+  namespace: studymate
+spec:
+  selector:
+    app: recsys-service
+  ports:
+    - protocol: TCP
+      port: 8005
+      targetPort: 8005
+  type: ClusterIP

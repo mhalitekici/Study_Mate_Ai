@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: multi-agent
+  namespace: studymate
+  labels:
+    app: multi-agent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: multi-agent
+  template:
+    metadata:
+      labels:
+        app: multi-agent
+    spec:
+      containers:
+        - name: multi-agent
+          image: studymate/multi-agent:latest
+          ports:
+            - containerPort: 8010
+          env:
+            - name: OLLAMA_URL
+              value: "http://ollama:11434"
+            - name: OLLAMA_MODEL
+              value: "qwen3.5:4b"
+            - name: QDRANT_URL
+              value: "http://qdrant:6333"
+            - name: MEMORY_SERVICE_URL
+              value: "http://memory-service:8004"
+            - name: REDIS_URL
+              value: "redis://redis:6379"
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "200m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+          livenessProbe:
+            httpGet:
+              path: /agent/health
+              port: 8010
+            initialDelaySeconds: 60
+            periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: multi-agent
+  namespace: studymate
+spec:
+  selector:
+    app: multi-agent
+  ports:
+    - protocol: TCP
+      port: 8010
+      targetPort: 8010
+  type: ClusterIP

@@ -1,0 +1,26 @@
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: studymate-mtls
+  namespace: studymate
+spec:
+  mtls:
+    mode: STRICT
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: studymate-authz
+  namespace: studymate
+spec:
+  action: ALLOW
+  rules:
+    - from:
+        - source:
+            principals:
+              - "cluster.local/ns/studymate/sa/auth-service-sa"
+              - "cluster.local/ns/studymate/sa/ai-service-sa"
+              - "cluster.local/ns/studymate/sa/multi-agent-sa"
+      to:
+        - operation:
+            methods: ["GET", "POST", "PUT", "DELETE"]

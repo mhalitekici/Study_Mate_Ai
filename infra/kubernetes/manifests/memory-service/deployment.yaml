@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: memory-service
+  namespace: studymate
+  labels:
+    app: memory-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: memory-service
+  template:
+    metadata:
+      labels:
+        app: memory-service
+    spec:
+      containers:
+        - name: memory-service
+          image: studymate/memory-service:latest
+          ports:
+            - containerPort: 8004
+          env:
+            - name: MONGODB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: memory-secrets
+                  key: mongodb-url
+            - name: AUTH_SERVICE_URL
+              value: "http://auth-service:8001"
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+          livenessProbe:
+            httpGet:
+              path: /memory/health
+              port: 8004
+            initialDelaySeconds: 30
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: memory-service
+  namespace: studymate
+spec:
+  selector:
+    app: memory-service
+  ports:
+    - protocol: TCP
+      port: 8004
+      targetPort: 8004
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: memory-secrets
+  namespace: studymate
+type: Opaque
+stringData:
+  mongodb-url: "mongodb://mongo_user:mongo_pass@mongodb:27017/memory_db?authSource=admin"

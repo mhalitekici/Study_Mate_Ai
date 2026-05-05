@@ -1,0 +1,13 @@
+apiVersion: v2
+name: studymate-ai
+description: StudyMate AI - AI-powered study assistant platform
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - ai
+  - education
+  - microservices
+maintainers:
+  - name: Mehmet Halit Ekici
+    email: halit@studymate.com

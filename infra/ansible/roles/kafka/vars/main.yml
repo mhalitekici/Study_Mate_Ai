@@ -1,0 +1,7 @@
+---
+kafka_version: "3.5.1"
+kafka_replicas: 3
+kafka_storage_size: "10Gi"
+zookeeper_replicas: 3
+zookeeper_storage_size: "5Gi"
+topic_partitions: 3

@@ -1,0 +1,64 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: studymate-ingress
+  namespace: studymate
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/rate-limit: "10"
+    nginx.ingress.kubernetes.io/rate-limit-burst-multiplier: "2"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: studymate.local
+      http:
+        paths:
+          - path: /api/auth
+            pathType: Prefix
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8001
+          - path: /api/materials
+            pathType: Prefix
+            backend:
+              service:
+                name: material-service
+                port:
+                  number: 8002
+          - path: /api/ai
+            pathType: Prefix
+            backend:
+              service:
+                name: ai-service
+                port:
+                  number: 8003
+          - path: /api/memory
+            pathType: Prefix
+            backend:
+              service:
+                name: memory-service
+                port:
+                  number: 8004
+          - path: /api/agent
+            pathType: Prefix
+            backend:
+              service:
+                name: multi-agent
+                port:
+                  number: 8010
+          - path: /api/recsys
+            pathType: Prefix
+            backend:
+              service:
+                name: recsys-service
+                port:
+                  number: 8005
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: studymate
+  labels:
+    istio-injection: enabled
