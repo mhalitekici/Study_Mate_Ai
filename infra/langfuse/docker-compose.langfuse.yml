@@ -1,0 +1,31 @@
+version: '3.9'
+
+services:
+  langfuse:
+    image: langfuse/langfuse:2
+    container_name: langfuse
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://auth_user:auth_pass@postgres-auth:5432/langfuse_db
+      NEXTAUTH_SECRET: studymate_langfuse_secret_2026
+      NEXTAUTH_URL: http://localhost:3001
+      SALT: studymate_salt_2026
+      TELEMETRY_ENABLED: "false"
+      NEXT_PUBLIC_SIGN_UP_DISABLED: "false"
+      LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES: "false"
+    ports:
+      - "3001:3000"
+    networks:
+      - studymate-network
+    depends_on:
+      - postgres-auth
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/api/public/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+networks:
+  studymate-network:
+    external: true
+    name: study_mate_ai_studymate-network
