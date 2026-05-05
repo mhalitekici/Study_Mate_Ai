@@ -1,0 +1,26 @@
+
+StudyMate AI - Software Engineering Notes
+
+Chapter 1: Microservices Architecture
+Microservices is an architectural style where an application is built as a collection of small, independent services.
+Each service runs in its own process and communicates via APIs.
+Key benefits: scalability, fault isolation, independent deployment.
+
+Chapter 2: Kafka Event Streaming
+Apache Kafka is a distributed event streaming platform.
+Topics are categories where messages are published.
+Offsets track the position of each message within a partition.
+Producers publish messages, consumers read them.
+Kafka is chosen over RabbitMQ because it supports message replay.
+
+Chapter 3: RAG - Retrieval Augmented Generation
+RAG combines information retrieval with text generation.
+It retrieves relevant documents from a vector database.
+The retrieved context is injected into the LLM prompt.
+This reduces hallucination and grounds answers in real data.
+
+Chapter 4: Redis Caching
+Redis is an in-memory data store used for caching.
+Cache hit: the answer exists in Redis, returned instantly.
+Cache miss: the answer is not cached, LLM is called.
+TTL (Time To Live) defines how long cache entries persist.

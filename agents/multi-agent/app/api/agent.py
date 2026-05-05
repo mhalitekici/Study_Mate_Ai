@@ -1,7 +1,8 @@
-from fastapi import APIRouter, HTTPException, Header
+from fastapi import APIRouter, HTTPException
 from app.core.graph import agent_graph
 from app.core.config import settings
 from app.core.state import AgentState
+from app.core.cache import get_cached_answer, set_cached_answer
 from pydantic import BaseModel
 import httpx
 
@@ -17,6 +18,7 @@ class AgentResponse(BaseModel):
     evaluation_score: float
     evaluation_feedback: str
     user_id: int
+    cached: bool = False
 
 async def save_to_memory(user_id: int, question: str, answer: str):
     try:
@@ -35,6 +37,14 @@ async def save_to_memory(user_id: int, question: str, answer: str):
 
 @router.post("/ask", response_model=AgentResponse)
 async def ask_agent(request: AgentRequest):
+
+    # Redis cache kontrolü
+    cached = get_cached_answer(request.question, request.user_id)
+    if cached:
+        print(f"[Agent] Returning cached answer")
+        cached_data = {k: v for k, v in cached.items() if k != 'cached'}
+        return AgentResponse(**cached_data, cached=True)
+
     try:
         from app.core.langfuse_client import langfuse
         trace = langfuse.trace(
@@ -59,22 +69,37 @@ async def ask_agent(request: AgentRequest):
 
     try:
         final_state = await agent_graph.ainvoke(initial_state)
-        await save_to_memory(
-            request.user_id,
-            request.question,
-            final_state["answer"]
-        )
+        answer = final_state["answer"]
 
-        if trace:
-            trace.update(output=final_state["answer"])
+        # Eğer cevap boşsa bir kez daha dene
+        if not answer or len(answer) < 10:
+            print("[Agent] Empty answer, retrying...")
+            final_state = await agent_graph.ainvoke(initial_state)
+            answer = final_state["answer"]
 
-        return AgentResponse(
-            question=request.question,
-            answer=final_state["answer"],
-            evaluation_score=final_state["evaluation_score"],
-            evaluation_feedback=final_state["evaluation_feedback"],
-            user_id=request.user_id
-        )
+        if answer and len(answer) > 10:
+            await save_to_memory(request.user_id, request.question, answer)
+
+            result = {
+                "question": request.question,
+                "answer": answer,
+                "evaluation_score": final_state["evaluation_score"],
+                "evaluation_feedback": final_state["evaluation_feedback"],
+                "user_id": request.user_id,
+                "cached": False
+            }
+
+            set_cached_answer(request.question, request.user_id, result)
+
+            if trace:
+                trace.update(output=answer)
+
+            return AgentResponse(**result)
+        else:
+            raise HTTPException(status_code=500, detail="Failed to generate answer after retry")
+
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

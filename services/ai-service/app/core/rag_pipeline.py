@@ -69,7 +69,7 @@ STUDENT QUESTION: {question}
 
 ANSWER:"""
 
-    async with httpx.AsyncClient(timeout=60) as client:
+    async with httpx.AsyncClient(timeout=200) as client:
         response = await client.post(
             f"{settings.OLLAMA_URL}/api/generate",
             json={

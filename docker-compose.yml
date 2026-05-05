@@ -97,6 +97,7 @@ services:
       QDRANT_URL: http://qdrant:6333
       MEMORY_SERVICE_URL: http://memory-service:8004
       AUTH_SERVICE_URL: http://auth-service:8001
+      REDIS_URL: redis://redis:6379
       LANGFUSE_PUBLIC_KEY: pk-lf-4ea992ff-0d02-48ae-b1cc-c418d5819f7c
       LANGFUSE_SECRET_KEY: sk-lf-e8ad74b9-449f-4f49-9612-525365c132db
       LANGFUSE_HOST: http://host.docker.internal:3001

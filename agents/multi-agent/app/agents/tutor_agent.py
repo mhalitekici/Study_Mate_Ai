@@ -2,19 +2,23 @@ from app.core.state import AgentState
 from app.core.config import settings
 import httpx
 import time
+import os
 
-SYSTEM_PROMPT = """You are StudyMate AI, an expert educational assistant.
-Your role is to help students understand their study materials deeply.
-
-Guidelines:
-- Base answers primarily on the provided context
-- Be clear, concise, and educational  
-- Use examples to clarify complex concepts
-- If context is insufficient, acknowledge it and provide general knowledge
-- Encourage deeper learning"""
+def load_system_prompt() -> str:
+    prompt_path = os.path.join(
+        os.path.dirname(__file__), 
+        "../../prompts/tutor_prompt.md"
+    )
+    try:
+        with open(prompt_path, "r", encoding="utf-8") as f:
+            return f.read()
+    except Exception:
+        return "You are StudyMate AI, an expert educational assistant."
 
 async def tutor_agent(state: AgentState) -> AgentState:
     print(f"[Tutor Agent] Generating answer for: {state['question'][:50]}...")
+
+    system_prompt = load_system_prompt()
 
     history_text = ""
     for msg in state.get("history", [])[-6:]:
@@ -37,13 +41,13 @@ ANSWER:"""
     start_time = time.time()
 
     try:
-        async with httpx.AsyncClient(timeout=120) as client:
+        async with httpx.AsyncClient(timeout=180) as client:
             response = await client.post(
                 f"{settings.OLLAMA_URL}/api/generate",
                 json={
                     "model": settings.OLLAMA_MODEL,
                     "prompt": prompt,
-                    "system": SYSTEM_PROMPT,
+                    "system": system_prompt,
                     "stream": False
                 }
             )
@@ -56,7 +60,6 @@ ANSWER:"""
             print(f"[Tutor Agent] Answer generated ({len(answer)} chars)")
             print(f"[Tutor Agent] Latency: {round(latency, 2)}s | Tokens: {completion_tokens}")
 
-            # Langfuse'a gönder
             try:
                 from langfuse import Langfuse
                 lf = Langfuse(
@@ -81,7 +84,6 @@ ANSWER:"""
                     }
                 )
                 lf.flush()
-                print(f"[Tutor Agent] Sent to Langfuse ✓")
             except Exception as e:
                 print(f"[Tutor Agent] Langfuse error: {e}")
 

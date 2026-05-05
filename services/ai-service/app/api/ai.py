@@ -80,8 +80,8 @@ async def generate(request: QuestionRequest):
         "user_id": request.user_id
     }
 
-    # Redis'e cache'le
-    set_cached_answer(request.question, request.user_id, result)
+    if answer and len(answer) > 50 and "error" not in answer.lower():
+        set_cached_answer(request.question, request.user_id, result)
 
     if trace:
         trace.update(output=answer)

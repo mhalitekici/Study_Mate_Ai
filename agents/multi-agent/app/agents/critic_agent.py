@@ -1,25 +1,23 @@
 from app.core.state import AgentState
 from app.core.config import settings
 import httpx
+import os
 
-CRITIC_PROMPT = """You are an educational quality evaluator.
-Evaluate the given answer and return ONLY a JSON response.
-
-Evaluation criteria:
-- Relevance to the question (0-10)
-- Use of provided context (0-10)  
-- Clarity and educational value (0-10)
-- Accuracy (0-10)
-
-Return ONLY this JSON format:
-{
-  "score": <average_score_0_to_10>,
-  "feedback": "<one sentence feedback>",
-  "needs_retry": <true_if_score_below_5>
-}"""
+def load_critic_prompt() -> str:
+    prompt_path = os.path.join(
+        os.path.dirname(__file__),
+        "../../prompts/critic_prompt.md"
+    )
+    try:
+        with open(prompt_path, "r", encoding="utf-8") as f:
+            return f.read()
+    except Exception:
+        return "You are an educational quality evaluator. Return JSON with score, feedback, needs_retry."
 
 async def critic_agent(state: AgentState) -> AgentState:
     print(f"[Critic Agent] Evaluating answer quality...")
+
+    critic_system = load_critic_prompt()
 
     eval_prompt = f"""QUESTION: {state['question']}
 
@@ -36,7 +34,7 @@ Evaluate this answer and return ONLY the JSON response."""
                 json={
                     "model": settings.OLLAMA_MODEL,
                     "prompt": eval_prompt,
-                    "system": CRITIC_PROMPT,
+                    "system": critic_system,
                     "stream": False,
                     "format": "json"
                 }
