@@ -1,0 +1,44 @@
+Microservices Architecture - Study Notes
+
+Chapter 1: What is Microservices?
+Microservices is an architectural style where an application is built as small independent services.
+Each service runs in its own process and communicates via well-defined APIs.
+Services are organized around business capabilities such as Auth, Payment, Notification.
+
+Chapter 2: Monolith vs Microservices
+Monolith: Simple to develop, hard to scale, single point of failure.
+Microservices: Independent deployment, independent scaling, but complex to manage.
+When to use Monolith: MVP, small team, early stage startup.
+When to use Microservices: Large team, high scale requirements, mature product.
+
+Chapter 3: Database Per Service Pattern
+Each microservice must have its own database. This is critical.
+Why: Independence, each service can choose the right database for its needs.
+Sharing databases between services creates tight coupling and defeats the purpose.
+Auth Service uses PostgreSQL for relational user data.
+Material Service uses PostgreSQL plus MinIO for metadata and object storage.
+AI Service uses Qdrant vector database for semantic search.
+Memory Service uses MongoDB for flexible conversation history schema.
+
+Chapter 4: API Gateway Pattern
+API Gateway is the single entry point for all client requests.
+Responsibilities: Routing, rate limiting, authentication, load balancing.
+Nginx is used as high-performance reverse proxy and load balancer.
+Rate limiting prevents abuse by limiting requests per second per IP address.
+Load balancing distributes traffic across multiple service instances.
+
+Chapter 5: Kafka in Microservices
+Kafka enables loose coupling between services through events.
+Producer: Service that publishes events. Material Service publishes material.uploaded event.
+Consumer: Service that subscribes to events. AI Service consumes material.uploaded event.
+Topic: Category of events such as material.uploaded and answer.generated.
+Offset: Position of a message in a partition. Consumers track their offset.
+Why Kafka over RabbitMQ: Message replay, log-based durability, high throughput.
+Why Kafka over NATS: Stronger persistence guarantees, better for event sourcing.
+
+Chapter 6: Containerization
+Docker packages application and dependencies into portable containers.
+Docker Compose runs multiple containers together for local development.
+Kubernetes orchestrates containers at scale with deployment, scaling, and healing.
+Pod is the smallest deployable unit in Kubernetes.
+Helm is the package manager for Kubernetes.

@@ -1,0 +1,41 @@
+Observability in Distributed Systems - Study Notes
+
+Chapter 1: What is Observability?
+Observability is the ability to understand the internal state of a system from its external outputs.
+It consists of three pillars: Metrics, Logs, and Traces.
+Without observability, debugging distributed systems is nearly impossible.
+
+Chapter 2: Metrics
+Metrics are numerical measurements collected over time, also called time-series data.
+Examples: CPU usage, memory consumption, request count, error rate, latency.
+Prometheus: Pull-based metrics collector. Scrapes /metrics endpoints every 15 seconds.
+VictoriaMetrics: High-performance alternative to Prometheus, uses less memory.
+InfluxDB: Push-based time-series database, better for IoT and high-frequency data.
+Grafana: Visualization tool that displays metrics from Prometheus and other sources.
+
+Chapter 3: Logs
+Logs are timestamped records of discrete events that occurred in the system.
+Structured logs in JSON format are machine-readable and easier to query.
+Loki: Log aggregation system by Grafana Labs. Label-based indexing, very efficient.
+Elasticsearch Logstash Kibana Stack: Powerful but resource-intensive alternative.
+Key difference from metrics: Logs tell WHAT happened, metrics tell HOW MUCH.
+
+Chapter 4: Traces
+Distributed tracing tracks a request as it flows through multiple services.
+A trace consists of spans, each representing a unit of work in one service.
+Traces answer: How did this request travel through the system? Where was the bottleneck?
+Tempo: Distributed tracing backend by Grafana Labs, integrates with Grafana.
+Jaeger: Open-source distributed tracing by CNCF, widely used in Kubernetes.
+OpenTelemetry: Vendor-neutral standard for collecting traces, metrics, and logs.
+
+Chapter 5: LLM-Specific Observability
+Standard monitoring tools do not capture LLM-specific metrics.
+Langfuse: Open-source LLM observability. Tracks token usage, latency, model comparisons.
+LangSmith: LangChain observability platform.
+Key LLM metrics: tokens per second, prompt tokens, completion tokens, cost per request.
+
+Chapter 6: Alerts
+Alerts notify engineers when something goes wrong or a threshold is exceeded.
+Alert conditions: Error rate above 5 percent, latency above 500ms, pod restart above 3 times.
+Alert fatigue: Too many alerts cause engineers to ignore them.
+Best practice: Alert on symptoms that affect users, not internal metrics.

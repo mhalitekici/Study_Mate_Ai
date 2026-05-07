@@ -1,11 +1,15 @@
 from fastapi import FastAPI
-from app.core.database import Base, engine
 from app.api.material import router as material_router
 from prometheus_fastapi_instrumentator import Instrumentator
+from fastapi.security import HTTPBearer
 
-Base.metadata.create_all(bind=engine)
+security = HTTPBearer()
 
-app = FastAPI(title="Material Service", version="1.0.0")
+app = FastAPI(
+    title="Material Service",
+    version="1.0.0",
+    swagger_ui_parameters={"persistAuthorization": True}
+)
 
 Instrumentator().instrument(app).expose(app)
 

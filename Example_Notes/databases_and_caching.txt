@@ -1,0 +1,41 @@
+Databases and Caching - Study Notes
+
+Chapter 1: RDBMS vs NoSQL
+Relational Database RDBMS: Structured data, SQL queries, ACID transactions.
+Examples: PostgreSQL, MySQL, SQLite.
+Best for: User data, financial transactions, anything requiring strong consistency.
+NoSQL Database: Flexible schema, horizontal scaling, eventual consistency.
+Types: Document MongoDB, Key-Value Redis, Vector Qdrant.
+Best for: Unstructured data, high write throughput, flexible schemas.
+
+Chapter 2: PostgreSQL
+PostgreSQL is an advanced open-source relational database.
+ACID properties: Atomicity, Consistency, Isolation, Durability.
+Use case in StudyMate AI: Auth service user credentials, Material service file metadata.
+
+Chapter 3: MongoDB
+MongoDB is a document-oriented NoSQL database.
+Stores data as BSON Binary JSON documents.
+Flexible schema: Each document can have different fields.
+Use case in StudyMate AI: Memory service conversation history, RecSys user interactions.
+
+Chapter 4: Vector Databases
+Vector databases store and query high-dimensional vectors called embeddings.
+Embeddings are numerical representations of text and other data.
+Semantic search finds similar content based on meaning, not exact keywords.
+Qdrant is a high-performance vector database with filtering support.
+Used in RAG to store document embeddings and retrieve relevant chunks for LLM context.
+
+Chapter 5: Redis Caching
+Redis is an in-memory data structure store used as cache and message broker.
+Cache hit: Requested data found in Redis, returned instantly in microseconds.
+Cache miss: Data not in Redis, must fetch from original source in milliseconds.
+TTL Time To Live: Expiration time for cached data. Example 3600 seconds equals 1 hour.
+Use case in StudyMate AI: Cache AI answers for 1 hour. Same question returns 5000x faster.
+
+Chapter 6: Cold Storage Architecture
+Cold storage is for data that is rarely accessed but must be retained.
+Hot storage: Frequently accessed data, fast retrieval, higher cost.
+Cold storage: Infrequently accessed data, slower retrieval, lower cost.
+Implementation: Two MinIO buckets named hot-materials and cold-materials.
+Materials older than 30 days are automatically archived to cold storage.

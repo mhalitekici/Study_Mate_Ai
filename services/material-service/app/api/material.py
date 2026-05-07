@@ -9,11 +9,15 @@ from app.schemas.material import MaterialResponse, MaterialListResponse
 import httpx
 import uuid
 import io
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.openapi.utils import get_openapi
+
+security = HTTPBearer()
 
 router = APIRouter(prefix="/materials", tags=["materials"])
 
-async def get_current_user(authorization: str = Header(...)):
-    token = authorization.replace("Bearer ", "")
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    token = credentials.credentials
     async with httpx.AsyncClient() as client:
         response = await client.get(
             f"{settings.AUTH_SERVICE_URL}/auth/validate",

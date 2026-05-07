@@ -1,0 +1,26 @@
+Python Fundamentals - Study Notes
+
+Chapter 1: What is Python?
+Python is a high-level, interpreted, general-purpose programming language created by Guido van Rossum in 1991.
+It emphasizes code readability and simplicity, making it one of the most popular languages in the world.
+Python supports multiple programming paradigms: procedural, object-oriented, and functional programming.
+
+Chapter 2: Key Features
+Interpreted: Code runs line by line without compilation.
+Dynamically typed: Variable types are determined at runtime.
+Garbage collected: Memory is managed automatically.
+Extensive standard library: batteries included philosophy.
+Cross-platform: Runs on Windows, Linux, macOS.
+
+Chapter 3: Python in Backend Development
+FastAPI: Modern, fast web framework for building APIs with Python.
+SQLAlchemy: ORM for database interactions.
+Pydantic: Data validation using Python type hints.
+Uvicorn: ASGI server for running FastAPI applications.
+Python is widely used for microservices due to its simplicity and rich ecosystem.
+
+Chapter 4: Async Programming
+asyncio library enables asynchronous programming in Python.
+async/await syntax allows non-blocking I/O operations.
+This is critical for high-performance web applications and AI services.
+Event loops manage the execution of async tasks efficiently.

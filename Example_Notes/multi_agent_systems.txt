@@ -1,0 +1,42 @@
+Multi-Agent Systems - Study Notes
+
+Chapter 1: What is an Agent?
+An agent is an AI system that perceives its environment and takes actions to achieve goals.
+Unlike simple LLM calls, agents can use tools, maintain memory, and make decisions autonomously.
+Agents combine reasoning with action in a continuous loop.
+
+Chapter 2: What is a Multi-Agent System?
+A multi-agent system consists of multiple specialized agents working together.
+Each agent has a specific role and expertise area.
+Agents communicate and coordinate to solve complex problems.
+Multi-agent systems outperform single agents on complex tasks requiring diverse skills.
+
+Chapter 3: Agent vs Multi-Agent
+Single Agent: One LLM with access to multiple tools. Simple tasks, single context window.
+Multi-Agent: Multiple specialized LLMs, each expert in one domain.
+Example: Planner Agent analyzes, Retrieval Agent searches, Tutor Agent generates, Critic Agent evaluates.
+
+Chapter 4: LLM Selection Criteria
+Number of parameters: B means Billion. More parameters means more knowledge but slower.
+Context window size: How much text the model can process at once.
+Open source vs proprietary: Open source allows local deployment.
+Latency vs quality tradeoff: Smaller models are faster, larger ones are smarter.
+
+Chapter 5: Memory in Agent Systems
+Short-term memory: Current conversation context, stored in context window.
+Long-term memory: Persistent storage across sessions, stored in databases.
+Semantic memory: Knowledge base, stored in vector databases.
+MongoDB is used for conversation history due to flexible schema.
+Redis is used for fast cache but lacks persistence for long-term memory.
+
+Chapter 6: Isolation Environments
+Docker container: Lightweight, fast, port isolation, resource limits.
+Virtual Machine: Full OS isolation, more secure but heavier.
+Sandbox: Restricted execution environment, maximum security.
+Docker is preferred for agent deployment due to speed and ecosystem support.
+
+Chapter 7: Evaluations
+LLM Evaluation: BLEU, ROUGE scores for text quality measurement.
+Agent Evaluation: Task completion rate, tool usage accuracy, response relevance.
+Critic Agent pattern: One agent scores the output of another agent on a scale of 0 to 10.
+Score below 5 triggers automatic retry for better quality responses.

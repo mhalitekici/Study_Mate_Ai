@@ -8,7 +8,7 @@ by combining retrieved context, conversation history, and LLM capabilities.
 1. Context: Retrieved document chunks from Qdrant
 2. History: Last 6 conversation turns from Memory Service
 3. Question: Current student question
-4. LLM: Ollama with Qwen 2.5 model
+4. LLM: Ollama with Qwen 3.5:4b model
 
 ## Why RAG?
 RAG (Retrieval-Augmented Generation) grounds LLM responses in actual study materials:
